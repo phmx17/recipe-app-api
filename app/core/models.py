@@ -1,3 +1,36 @@
-from django.db import models  # noqa
+"""
+Database models
+"""
+
+from django.db import models
+from django.contrib.auth.models import(
+  AbstractBaseUser,
+  BaseUserManager,
+  PermissionsMixin
+)
+
+class UserManager(BaseUserManager):
+  """Manager for users"""
+
+  def create_user(self, email, password=None, **extra_fields): # name of method 'create_user' is mandatory
+    """Create, save and return new user"""
+    user = self.model(email=email, **extra_fields)
+    user.set_password(password)
+    user.save(using=self._db)
+
+    return user
+
 
 # Create your models here.
+class User(AbstractBaseUser, PermissionsMixin):  # AbstractBaseUser = functionality for auth system; PermissionsMixin = permissions and fields
+  """User in the system"""
+  email = models.EmailField(max_length=255, unique=True)
+  name = models.CharField(max_length=255)
+  is_active = models.BooleanField(default=True)
+  is_staff = models.BooleanField(default=False)
+
+  objects = UserManager()
+
+  USERNAME_FIELD = 'email'
+
+
